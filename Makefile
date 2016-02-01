@@ -1,4 +1,4 @@
-# contrib/test_decoding/Makefile
+# contrib/audit_events/Makefile
 
 MODULE_big = audit
 OBJS = audit_events.o serializer.o
@@ -12,7 +12,7 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 else
-subdir = contrib/test_decoding
+subdir = contrib/audit_events
 top_builddir = ../..
 include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
@@ -34,41 +34,41 @@ submake-regress:
 submake-isolation:
 	$(MAKE) -C $(top_builddir)/src/test/isolation all
 
-submake-test_decoding:
-	$(MAKE) -C $(top_builddir)/contrib/test_decoding
+submake-audit_events:
+	$(MAKE) -C $(top_builddir)/contrib/audit_events
 
 REGRESSCHECKS=ddl rewrite toast permissions decoding_in_xact decoding_into_rel binary prepared
 
-regresscheck: all | submake-regress submake-test_decoding
+regresscheck: all | submake-regress submake-audit_events
 	$(MKDIR_P) regression_output
 	$(pg_regress_check) \
-	    --temp-config $(top_srcdir)/contrib/test_decoding/logical.conf \
+	    --temp-config $(top_srcdir)/contrib/audit_events/logical.conf \
 	    --temp-install=./tmp_check \
-	    --extra-install=contrib/test_decoding \
+	    --extra-install=contrib/audit_events \
 	    --outputdir=./regression_output \
 	    $(REGRESSCHECKS)
 
-regresscheck-install-force: | submake-regress submake-test_decoding
+regresscheck-install-force: | submake-regress submake-audit_events
 	$(pg_regress_installcheck) \
-	    --extra-install=contrib/test_decoding \
+	    --extra-install=contrib/audit_events \
 	    $(REGRESSCHECKS)
 
 ISOLATIONCHECKS=mxact delayed_startup ondisk_startup concurrent_ddl_dml
 
-isolationcheck: all | submake-isolation submake-test_decoding
+isolationcheck: all | submake-isolation submake-audit_events
 	$(MKDIR_P) isolation_output
 	$(pg_isolation_regress_check) \
-	    --temp-config $(top_srcdir)/contrib/test_decoding/logical.conf \
-	    --extra-install=contrib/test_decoding \
+	    --temp-config $(top_srcdir)/contrib/audit_events/logical.conf \
+	    --extra-install=contrib/audit_events \
 	    --outputdir=./isolation_output \
 	    $(ISOLATIONCHECKS)
 
-isolationcheck-install-force: all | submake-isolation submake-test_decoding
+isolationcheck-install-force: all | submake-isolation submake-audit_events
 	$(pg_isolation_regress_installcheck) \
-	    --extra-install=contrib/test_decoding \
+	    --extra-install=contrib/audit_events \
 	    $(ISOLATIONCHECKS)
 
-PHONY: submake-test_decoding submake-regress check \
+PHONY: submake-audit_events submake-regress check \
 	regresscheck regresscheck-install-force \
 	isolationcheck isolationcheck-install-force
 
